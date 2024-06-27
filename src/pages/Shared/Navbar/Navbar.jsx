@@ -47,11 +47,11 @@ const Navbar = () => {
             {navItems}
           </ul>
         </div>
-        <Link to="/">
-          <img src={logo} alt="logo" />
+        <Link className="d-flex" to="/">
+          <img className="h-16" src={logo} alt="logo" />
         </Link>
       </div>
-      <div className="navbar-center">
+      <div className="navbar-center md:block hidden">
         <div className="flex-none">
           <ul className="menu menu-horizontal px-1">{navItems}</ul>
         </div>
@@ -92,7 +92,7 @@ const Navbar = () => {
             <span className="badge badge-xs badge-primary indicator-item"></span>
           </div>
         </button>
-        <button className="btn btn-outline outline-danger">Appointment</button>
+        <button className="btn btn-outline btn-warning">Appointment</button>
       </div>
     </div>
   );
