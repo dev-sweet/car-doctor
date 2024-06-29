@@ -5,10 +5,10 @@ const Services = () => {
   const [services, setServices] = useState([]);
 
   useEffect(() => {
-    fetch("services.json")
+    fetch("http://localhost:9000/services")
       .then((res) => res.json())
       .then((data) => setServices(data));
-  });
+  }, []);
   return (
     <div>
       <div className="text-center">
