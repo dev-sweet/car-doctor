@@ -1,18 +1,20 @@
 import { FcGoogle } from "react-icons/fc";
 import img from "../../assets/images/login/login.svg";
 import { FaFacebookF, FaLinkedin } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 const Login = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { signIn } = useContext(AuthContext);
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
 
+  console.log(location);
   const handleChange = (e) => {
-    // const name = e.target.name;
     setUser((prevData) => {
       return { ...prevData, [e.target.name]: e.target.value };
     });
@@ -24,10 +26,15 @@ const Login = () => {
       .then((data) => {
         const user = data.user;
         if (user.email) {
+          navigate(location.pathname ? location.pathname : "/");
           alert("Signin success!");
         }
       })
       .catch((err) => console.log(err));
+  };
+
+  const handleSignUp = () => {
+    navigate("/signup");
   };
   return (
     <div className="hero bg-base-200 min-h-screen">
@@ -37,7 +44,7 @@ const Login = () => {
         </div>
         <div className="w-1/2 card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
           <h1 className="text-3xl font-bold pt-5 ps-5 text-center">Login</h1>
-          <form onSubmit={(e) => handleSubmit(e)} className="card-body">
+          <form onSubmit={handleSubmit} className="card-body">
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Email</span>
@@ -46,7 +53,7 @@ const Login = () => {
                 type="email"
                 placeholder="email"
                 className="input input-bordered"
-                onChange={(e) => handleChange(e)}
+                onChange={handleChange}
                 required
               />
             </div>
@@ -58,7 +65,7 @@ const Login = () => {
                 type="password"
                 placeholder="password"
                 className="input input-bordered"
-                onChange={(e) => handleChange(e)}
+                onChange={handleChange}
                 required
               />
               <label className="label">
@@ -93,9 +100,9 @@ const Login = () => {
             </div>
             <p className="mt-3 mb-5 text-center">
               Have an account?{" "}
-              <Link className="text-[#FF3811]" to="/signup">
+              <button onClick={handleSignUp} className="text-[#FF3811]">
                 Sign Up
-              </Link>
+              </button>
             </p>
           </div>
         </div>

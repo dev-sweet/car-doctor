@@ -1,33 +1,68 @@
 import { FcGoogle } from "react-icons/fc";
 import img from "../../assets/images/login/login.svg";
 import { FaFacebookF, FaLinkedin } from "react-icons/fa";
-import { Link } from "react-router-dom";
-import { useContext, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useContext, useRef, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
+import axios from "axios";
+
 const Signup = () => {
-  const { createUser } = useContext(AuthContext);
-  const [user, setUser] = useState({
+  const { createUser, signInWithGoogle } = useContext(AuthContext);
+  const [userForm, setUserForm] = useState({
     name: "",
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const referenceLocation = useRef(location);
+  console.log(referenceLocation);
   const handleChange = (e) => {
-    // const name = e.target.name;
-    setUser((prevData) => {
+    setUserForm((prevData) => {
       return { ...prevData, [e.target.name]: e.target.value };
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createUser(user.email, user.password)
+    createUser(userForm.email, userForm.password)
       .then((data) => {
-        const user = data.user;
-        if (user.email) {
-          alert("Signup success");
+        if (data?.user?.email) {
+          axios
+            .post("http://localhost:9000/jwt", userForm.email)
+            .then((res) => {
+              console.log(res.data);
+
+              alert("Signup success");
+            })
+            .catch((err) => console.log(err));
         }
       })
       .catch((err) => console.log(err));
+  };
+
+  const handleGoogleLogin = () => {
+    signInWithGoogle()
+      .then((data) => {
+        const user = { email: data?.user?.email };
+        if (data?.user?.email) {
+          axios
+            .post("http://localhost:9000/jwt", user, {
+              withCredentials: true,
+            })
+            .then((res) => {
+              if (res.data.success) {
+                console.log(res);
+                navigate("/login");
+                alert("Signup success");
+              }
+            })
+            .catch((err) => console.log(err));
+        }
+      })
+      .catch((error) => console.log(error));
   };
   return (
     <div className="hero bg-base-200 min-h-screen">
@@ -97,7 +132,10 @@ const Signup = () => {
               <button className="text-xl bg-gray-200 rounded-full p-2 flex items-center justify-center text-blue-500">
                 <FaLinkedin />
               </button>
-              <button className="text-xl bg-gray-200 rounded-full p-2 flex items-center justify-center">
+              <button
+                onClick={handleGoogleLogin}
+                className="text-xl bg-gray-200 rounded-full p-2 flex items-center justify-center"
+              >
                 <FcGoogle />
               </button>
             </div>

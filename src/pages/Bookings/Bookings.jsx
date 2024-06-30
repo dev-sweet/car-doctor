@@ -1,12 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import BookingRow from "./BookingRow";
+import axios from "axios";
 
 const Bookings = () => {
   const [bookings, setBookings] = useState([]);
   const { user } = useContext(AuthContext);
   const url = `http://localhost:9000/orders?email=${user?.email}`;
 
+  // handle delete
   const handleDelete = (id) => {
     const proceed = confirm("Do you sure you want to delete this booking!");
     if (proceed) {
@@ -15,16 +17,19 @@ const Bookings = () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data.deleteCount > 0) {
+          if (data.deletedCount > 0) {
             alert("Deleted success!");
             const deletedBookings = bookings.filter(
               (booking) => booking._id !== id
             );
+
             setBookings(deletedBookings);
           }
         });
     }
   };
+
+  // handle confirm
   const handleConfirm = (id) => {
     fetch(`http://localhost:9000/orders/${id}`, {
       method: "PATCH",
@@ -33,16 +38,20 @@ const Bookings = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         if (data.modifiedCount > 0) {
-          alert("Updated Succeess");
+          alert("Updated success!");
+          const newBookings = bookings.filter((booking) => booking._id !== id);
+          const remaining = bookings.find((booking) => booking._id === id);
+          remaining.status = "confirm";
+          setBookings([...newBookings, remaining]);
         }
-      });
+      })
+      .catch((err) => console.log(err));
   };
   useEffect(() => {
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => setBookings(data));
+    axios
+      .get(url, { withCredentials: true })
+      .then((res) => setBookings(res.data));
   }, [url]);
   return (
     <div>
@@ -50,7 +59,7 @@ const Bookings = () => {
       <div className="overflow-x-auto">
         <table className="table">
           <tbody>
-            {bookings.map((booking) => (
+            {bookings?.map((booking) => (
               <BookingRow
                 key={booking._id}
                 handleDelete={handleDelete}
