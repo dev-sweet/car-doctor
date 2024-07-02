@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
 import { app } from "../firebase/firebase.config";
+import axios from "axios";
 
 export const AuthContext = createContext();
 const auth = getAuth(app);
@@ -37,13 +38,17 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = () => {
-      setLoading(true);
-      onAuthStateChanged(auth, (currentUser) => {
-        setUser(currentUser);
-        setLoading(false);
-      });
-    };
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      const userEmail = currentUser?.email || user?.email;
+      const loggedUser = { email: userEmail };
+      setUser(currentUser);
+      if (!userEmail) {
+        axios.post("http://localhost:9000/logout", loggedUser, {
+          withCredentials: true,
+        });
+      }
+      setLoading(false);
+    });
 
     return () => {
       return unsubscribe();

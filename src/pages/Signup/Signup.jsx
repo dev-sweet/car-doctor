@@ -1,8 +1,8 @@
 import { FcGoogle } from "react-icons/fc";
 import img from "../../assets/images/login/login.svg";
 import { FaFacebookF, FaLinkedin } from "react-icons/fa";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useContext, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import axios from "axios";
 
@@ -15,10 +15,7 @@ const Signup = () => {
   });
 
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const referenceLocation = useRef(location);
-  console.log(referenceLocation);
   const handleChange = (e) => {
     setUserForm((prevData) => {
       return { ...prevData, [e.target.name]: e.target.value };
@@ -49,15 +46,11 @@ const Signup = () => {
         const user = { email: data?.user?.email };
         if (data?.user?.email) {
           axios
-            .post("http://localhost:9000/jwt", user, {
-              withCredentials: true,
-            })
+            .post("http://localhost:9000/jwt", user, { withCredentials: true })
             .then((res) => {
-              if (res.data.success) {
-                console.log(res);
-                navigate("/login");
-                alert("Signup success");
-              }
+              console.log(res.data);
+              navigate("/login");
+              alert("Signup success");
             })
             .catch((err) => console.log(err));
         }
